@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './Dashboard.css'; 
 
 function Dashboard() {
   const [polls, setPolls] = useState([]);
@@ -11,18 +12,33 @@ function Dashboard() {
       .then(setPolls);
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/');
+  };
+
+  const getTotalVotes = (options) =>
+    options.reduce((total, opt) => total + opt.votes, 0);
+
   return (
     <div className="container">
-      <h2>All Polls</h2>
-      <button onClick={() => navigate('/create')}>Create Poll</button>
-      <ul>
+      <div className="dashboard-header">
+        <h2>All Polls</h2>
+        <div>
+          <button onClick={() => navigate('/create')}>Create Poll</button>
+          <button onClick={handleLogout}>Logout</button>
+        </div>
+      </div>
+
+      <div className="polls-grid">
         {polls.map(poll => (
-          <li key={poll._id}>
-            {poll.question}
-            <button onClick={() => navigate(`/poll/${poll._id}`)}>View</button>
-          </li>
+          <div key={poll._id} className="poll-card">
+            <h3>{poll.question}</h3>
+            <p>Total Votes: {getTotalVotes(poll.options)}</p>
+            <button onClick={() => navigate(`/poll/${poll._id}`)}>View Poll</button>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }
